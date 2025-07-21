@@ -1,0 +1,40 @@
+{{ block "index" .}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Room Access</title>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-white text-black p-4">
+  <div class="bg-white border border-black rounded-lg p-8 w-full max-w-sm shadow">
+    <h1 class="text-xl font-semibold text-center mb-6">Room Access</h1>
+    <form id="roomForm" class="space-y-4">
+      <div>
+        <label for="roomName" class="block text-sm font-medium">Room Name</label>
+        <input id="roomName" name="roomName" type="text" placeholder="Room" required class="mt-1 w-full border border-black rounded px-3 py-2" />
+      </div>
+      <div>
+        <label for="userName" class="block text-sm font-medium">Your Name</label>
+        <input id="userName" name="userName" type="text" placeholder="Your Name" required class="mt-1 w-full border border-black rounded px-3 py-2" />
+      </div>
+      <div class="flex gap-2 pt-4">
+        <button type="submit" class="flex-1 bg-black text-white py-2 rounded" data-action="create">Create</button>
+        <button type="submit" class="flex-1 border border-black py-2 rounded" data-action="join">Join</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('roomForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const room = roomName.value.trim();
+      const user = userName.value.trim();
+      const action = e.submitter.dataset.action;
+      if (!room || !user) return alert('Please fill in all fields');
+      alert(`${action === 'create' ? 'Creating' : 'Joining'} room "${room}" as "${user}"`);
+    });
+  </script>
+</body>
+</html>
+{{ end }}
