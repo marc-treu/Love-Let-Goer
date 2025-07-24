@@ -1,12 +1,14 @@
 package main
 
 import (
-	"net/http"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func setupRouter() *gin.Engine {
+	db := make(map[string][]string)
+
 	// Disable Console Color
 	// gin.DisableConsoleColor()
 	router := gin.Default()
@@ -22,11 +24,21 @@ func setupRouter() *gin.Engine {
 		ctx.HTML(http.StatusOK, "landing", gin.H{})
 	})
 
-	// Serve static files (CSS, JS, etc.)
-	// r.Static("/static", "./static")
+	router.POST("/create", func(ctx *gin.Context) {
+		name := ctx.PostForm("roomName")
+		user := ctx.PostForm("userName")
+		db[name] = []string{user}
+		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/%s", name))
+	})
 
-	// Routes
-	// r.GET("/", homeHandler)
+	router.GET("/:name", func(ctx *gin.Context) {
+		_, ok := db[ctx.Param("name")]
+		if ok {
+			ctx.HTML(http.StatusOK, "room", gin.H{"title": ctx.Param("name")})
+			return
+		}
+		ctx.String(http.StatusNotFound, "")
+	})
 
 	return router
 }
