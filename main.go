@@ -18,8 +18,8 @@ func setupRouter() *gin.Engine {
 	})
 
 	// / endpoint
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index", gin.H{})
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "landing", gin.H{})
 	})
 
 	// Serve static files (CSS, JS, etc.)

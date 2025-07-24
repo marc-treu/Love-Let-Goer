@@ -1,10 +1,11 @@
-{{ block "index" .}}
+{{ block "landing" .}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Room Access</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.js" integrity="sha384-ksKjJrwjL5VxqAkAZAVOPXvMkwAykMaNYegdixAESVr+KqLkKE8XBDoZuwyWVUDv" crossorigin="anonymous"></script>
+<title>Room Access</title>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-white text-black p-6">
     <div class="relative">
@@ -14,7 +15,7 @@
         <!-- Main form container -->
         <div class="relative bg-white border border-[#3ca49d] rounded-xl p-14 w-full max-w-lg shadow">
             <h1 class="text-4xl font-semibold text-center mb-10">Room Access</h1>
-            <form id="roomForm" class="space-y-6">
+            <form id="roomForm" class="space-y-6" hx-post="/joinRoom">
                 <div>
                     <label for="roomName" class="block text-lg font-medium mb-2">Room Name</label>
                     <input 
@@ -38,12 +39,15 @@
                     />
                 </div>
                 <div class="flex gap-4 pt-6">
-                    <button 
-                        type="submit" 
+                    <button
                         class="flex-1 bg-[#3ca49d] text-white py-4 px-6 text-lg rounded-lg hover:bg-[#f9f5f2] transition-colors" 
-                        data-action="create"
-                    >
+                        type="button" 
+                        hx-post="/create" 
+                        hx-target="#result" 
+                        hx-include="closest form">
                         Create
+                    </button>
+
                     </button>
                     <button 
                         type="submit" 
@@ -54,19 +58,9 @@
                     </button>
                 </div>
             </form>
+            <div id="result"></div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('roomForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const room = roomName.value.trim();
-            const user = userName.value.trim();
-            const action = e.submitter.dataset.action;
-            if (!room || !user) return alert('Please fill in all fields');
-            alert(`${action === 'create' ? 'Creating' : 'Joining'} room "${room}" as "${user}"`);
-        });
-    </script>
 </body>
 </html>
 {{ end }}
