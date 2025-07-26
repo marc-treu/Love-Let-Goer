@@ -28,16 +28,19 @@ func setupRouter() *gin.Engine {
 		name := ctx.PostForm("roomName")
 		user := ctx.PostForm("userName")
 		db[name] = []string{user}
-		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/%s", name))
+		ctx.Header("HX-Redirect", fmt.Sprintf("/%s", name))
+		ctx.Status(200)
 	})
 
 	router.GET("/:name", func(ctx *gin.Context) {
-		_, ok := db[ctx.Param("name")]
+		var name string = ctx.Param("name")
+		fmt.Println(name)
+		_, ok := db[name]
 		if ok {
-			ctx.HTML(http.StatusOK, "room", gin.H{"title": ctx.Param("name")})
+			ctx.HTML(http.StatusOK, "room", gin.H{"title": name})
 			return
 		}
-		ctx.String(http.StatusNotFound, "")
+		ctx.Redirect(http.StatusFound, "/")
 	})
 
 	return router
