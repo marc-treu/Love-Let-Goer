@@ -32,9 +32,23 @@ func setupRouter() *gin.Engine {
 		ctx.Status(200)
 	})
 
+	router.POST("/join", func(ctx *gin.Context) {
+		name := ctx.PostForm("roomName")
+		user := ctx.PostForm("userName")
+		_, ok := db[name]
+		if ok {
+			db[name] = append(db[name], user)
+			ctx.HTML(http.StatusOK, "room", gin.H{"title": name})
+			return
+		} else {
+			db[name] = []string{user}
+		}
+		ctx.Header("HX-Redirect", fmt.Sprintf("/%s", name))
+		ctx.Status(200)
+	})
+
 	router.GET("/:name", func(ctx *gin.Context) {
 		var name string = ctx.Param("name")
-		fmt.Println(name)
 		_, ok := db[name]
 		if ok {
 			ctx.HTML(http.StatusOK, "room", gin.H{"title": name})
