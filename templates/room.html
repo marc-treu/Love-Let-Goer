@@ -7,8 +7,76 @@
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.js" integrity="sha384-ksKjJrwjL5VxqAkAZAVOPXvMkwAykMaNYegdixAESVr+KqLkKE8XBDoZuwyWVUDv" crossorigin="anonymous"></script>
 <title>{{ .title }}</title>
 </head>
-<body>
-    Hello world
+<body class="h-screen flex" style="background-color: #e9e9e9; color: #222222;">
+
+  <!-- Left: Player List -->
+  <aside class="w-1/5 p-4" style="background-color: #f8f8f8;">
+    <h2 class="text-lg mb-2 font-bold">Players</h2>
+    <ul id="player-list" class="space-y-2">
+      <li>playerA</li>
+      <li>playerB</li>
+      <li class="line-through opacity-50">playerC</li>
+    </ul>
+  </aside>
+
+  <!-- Center: Game Board -->
+  <main class="flex-1 flex flex-col items-center justify-between p-4">
+    <!-- Game Area -->
+    <div id="game-board" 
+         class="w-full h-3/4 rounded-lg flex items-center justify-center text-2xl font-semibold"
+         style="background-color: #f8f8f8;">
+      PlayerA turn
+    </div>
+
+    <!-- Role Button -->
+    <button id="role-btn" 
+            class="mt-4 px-6 py-3 rounded-lg text-xl transition-transform duration-200"
+            style="background-color: #f8f8f8; color: #222222;">
+      Role
+    </button>
+  </main>
+
+  <!-- Right: Chat -->
+  <aside class="w-1/4 p-4 flex flex-col" style="background-color: #f8f8f8;">
+    <h2 class="text-lg mb-2 font-bold">Chat</h2>
+    <div id="chat-box" class="flex-1 p-2 rounded overflow-y-auto" 
+         style="background-color: #e9e9e9;"></div>
+    <form id="chat-form" class="mt-2 flex">
+      <input type="text" name="message" 
+             class="flex-1 rounded-l px-2 py-1 border border-gray-300" 
+             placeholder="Type message..." style="color:#222222;">
+      <button class="px-4 rounded-r" style="background-color: #e9e9e9; color: #222222;">
+        Send
+      </button>
+    </form>
+  </aside>
+
+  <script>
+    // WebSocket connection for real-time updates
+    const ws = new WebSocket("ws://localhost:8080/ws");
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      // Update players
+      if (data.players) {
+        document.getElementById("player-list").innerHTML =
+          data.players.map(p => `<li class="${p.out ? 'line-through opacity-50' : ''}">${p.name}</li>`).join('');
+      }
+
+      // Update game board
+      if (data.turn) {
+        document.getElementById("game-board").textContent = data.turn + " turn";
+      }
+
+      // Update chat
+      if (data.chat) {
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML += `<div>${data.chat}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    };
+  </script>
+
 </body>
 </html>
 {{ end }}
