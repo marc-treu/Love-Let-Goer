@@ -3,7 +3,6 @@ package main
 import (
 	"LoveLetGoer/configs"
 	"LoveLetGoer/routes"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,38 +18,17 @@ func setupRouter() *gin.Engine {
 	// status endpoint
 	router.GET("/status", routes.Getstatus)
 
-	{
-		room := router.Group("/room")
-		room.GET("/:name", routes.GetRoom)
-	}
-
-	// / endpoint
+	// landing page endpoint
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "landing", gin.H{})
 	})
 
-	router.POST("/create", func(ctx *gin.Context) {
-		name := ctx.PostForm("roomName")
-		user := ctx.PostForm("userName")
-		configs.DB[name] = []string{user}
-		ctx.Header("HX-Redirect", fmt.Sprintf("room/%s", name))
-		ctx.Status(200)
-	})
-
-	router.POST("/join", func(ctx *gin.Context) {
-		name := ctx.PostForm("roomName")
-		user := ctx.PostForm("userName")
-		_, ok := configs.DB[name]
-		if ok {
-			configs.DB[name] = append(configs.DB[name], user)
-			ctx.HTML(http.StatusOK, "room", gin.H{"title": name})
-			return
-		} else {
-			configs.DB[name] = []string{user}
-		}
-		ctx.Header("HX-Redirect", fmt.Sprintf("room/%s", name))
-		ctx.Status(200)
-	})
+	{
+		room := router.Group("/room")
+		room.GET("/:name", routes.GetRoom)
+		room.POST("/create", routes.CreateRoom)
+		room.POST("/join", routes.JoinRoom)
+	}
 
 	return router
 }
