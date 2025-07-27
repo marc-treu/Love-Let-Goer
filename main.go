@@ -17,9 +17,7 @@ func setupRouter() *gin.Engine {
 	router.LoadHTMLGlob("templates/*")
 
 	// status endpoint
-	router.GET("/status", func(c *gin.Context) {
-		c.String(http.StatusOK, "OK")
-	})
+	router.GET("/status", routes.Getstatus)
 
 	// / endpoint
 	router.GET("/", func(ctx *gin.Context) {
