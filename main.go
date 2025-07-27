@@ -1,13 +1,15 @@
 package main
 
 import (
+	"LoveLetGoer/configs"
+	"LoveLetGoer/routes"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func setupRouter() *gin.Engine {
-	db := make(map[string][]string)
+	configs.ConfigureDB()
 
 	// Disable Console Color
 	// gin.DisableConsoleColor()
@@ -27,7 +29,7 @@ func setupRouter() *gin.Engine {
 	router.POST("/create", func(ctx *gin.Context) {
 		name := ctx.PostForm("roomName")
 		user := ctx.PostForm("userName")
-		db[name] = []string{user}
+		configs.DB[name] = []string{user}
 		ctx.Header("HX-Redirect", fmt.Sprintf("/%s", name))
 		ctx.Status(200)
 	})
@@ -35,27 +37,19 @@ func setupRouter() *gin.Engine {
 	router.POST("/join", func(ctx *gin.Context) {
 		name := ctx.PostForm("roomName")
 		user := ctx.PostForm("userName")
-		_, ok := db[name]
+		_, ok := configs.DB[name]
 		if ok {
-			db[name] = append(db[name], user)
+			configs.DB[name] = append(configs.DB[name], user)
 			ctx.HTML(http.StatusOK, "room", gin.H{"title": name})
 			return
 		} else {
-			db[name] = []string{user}
+			configs.DB[name] = []string{user}
 		}
 		ctx.Header("HX-Redirect", fmt.Sprintf("/%s", name))
 		ctx.Status(200)
 	})
 
-	router.GET("/:name", func(ctx *gin.Context) {
-		var name string = ctx.Param("name")
-		_, ok := db[name]
-		if ok {
-			ctx.HTML(http.StatusOK, "room", gin.H{"title": name})
-			return
-		}
-		ctx.Redirect(http.StatusFound, "/")
-	})
+	router.GET("/:name", routes.GetRoom)
 
 	return router
 }
