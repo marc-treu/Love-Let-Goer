@@ -19,6 +19,11 @@ func setupRouter() *gin.Engine {
 	// status endpoint
 	router.GET("/status", routes.Getstatus)
 
+	{
+		room := router.Group("/room")
+		room.GET("/:name", routes.GetRoom)
+	}
+
 	// / endpoint
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "landing", gin.H{})
@@ -28,7 +33,7 @@ func setupRouter() *gin.Engine {
 		name := ctx.PostForm("roomName")
 		user := ctx.PostForm("userName")
 		configs.DB[name] = []string{user}
-		ctx.Header("HX-Redirect", fmt.Sprintf("/%s", name))
+		ctx.Header("HX-Redirect", fmt.Sprintf("room/%s", name))
 		ctx.Status(200)
 	})
 
@@ -43,11 +48,9 @@ func setupRouter() *gin.Engine {
 		} else {
 			configs.DB[name] = []string{user}
 		}
-		ctx.Header("HX-Redirect", fmt.Sprintf("/%s", name))
+		ctx.Header("HX-Redirect", fmt.Sprintf("room/%s", name))
 		ctx.Status(200)
 	})
-
-	router.GET("/:name", routes.GetRoom)
 
 	return router
 }
